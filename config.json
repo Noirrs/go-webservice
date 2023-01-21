@@ -1,0 +1,5 @@
+{
+    "version": "0.0.1",
+    "mongoConnURL": "mongodb://localhost:27017",
+    "dbName": "leaw"    
+}
