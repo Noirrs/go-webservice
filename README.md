@@ -6,7 +6,9 @@
 
 # ⚡ Quick API Docs
 
-`/word/create`: ```
+`/word/create`: 
+
+```
   method: "POST",
   headers: { category: "Category Name"},
   body: {  
@@ -14,6 +16,7 @@
    "trued": Number,
    "falsed": Number
   }
+  
   ```
   
 # ✍️ Repository Structure 
