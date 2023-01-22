@@ -19,6 +19,23 @@
   
   ```
   
+  `/word/correct`: 
+
+```js
+
+//helps to add Trued or Falsed to the word
+
+  method: "POST",
+  headers: { category: "Category Name"},
+  body: {  
+   "value": "word",
+   "trued": Number,
+   "falsed": Number
+  }
+  
+  ```
+  
+  
 # ✍️ Repository Structure 
 
 ```
