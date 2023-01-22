@@ -1,8 +1,7 @@
 # 🤖 Word Practicing
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/Noirrs/go-service/tree/circleci-project-setup.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/Noirrs/getStructure/tree/circleci-project-setup)
 
-### 🌀 Word Practicing App is a tiny go service
+ 🌀 Word Practicing App is a tiny go service
 
 
 # ⚡Quick API Docs
