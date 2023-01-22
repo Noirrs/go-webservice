@@ -4,11 +4,22 @@
  🌀 Word Practicing App is a tiny go service
 
 
-# ⚡Quick API Docs
+# ⚡ Quick API Docs
 
 
 
-# ✍️ Source Code
+# ✍️ Repository Structure 
+
+├─ .gitignore
+├─ README.md
+├─ category.go
+├─ config.json
+├─ connect.go
+├─ go.mod
+├─ go.sum
+├─ handlerFuncs.go
+├─ main.go
+└─ service.go
 
 
 ## Resources
