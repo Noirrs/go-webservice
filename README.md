@@ -25,7 +25,7 @@
 
 ## Resources
 
-**Go**: https://go.dev/
+**Go**: [🌀](https://go.dev/)
 
 **Mongo Driver**: https://pkg.go.dev/go.mongodb.org/mongo-driver@v1.11.1
 
