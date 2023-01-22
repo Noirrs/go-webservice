@@ -23,17 +23,17 @@
 └─ service.go
 ```
 
-## Resources
+# 🔗 Resources
 
-**Go**: [🌀](https://go.dev/)
+[Go](https://go.dev/)
 
-**Mongo Driver**: https://pkg.go.dev/go.mongodb.org/mongo-driver@v1.11.1
+[Mongo Driver](https://pkg.go.dev/go.mongodb.org/mongo-driver@v1.11.1)
 
-**Gin**: https://pkg.go.dev/github.com/gin-gonic/gin@v1.8.1
+[Gin](https://pkg.go.dev/github.com/gin-gonic/gin@v1.8.1)
 
-**MongoDB**: https://www.mongodb.com/
+[MongoDB](https://www.mongodb.com/)
 
-**MongoDB Compass** (for local usage): https://www.mongodb.com/products/compass
+[MongoDB Compass** (for local usage)](https://www.mongodb.com/products/compass)
 
 ## Running the app
 
