@@ -10,6 +10,7 @@
 
 # ✍️ Repository Structure 
 
+```
 ├─ .gitignore
 ├─ README.md
 ├─ category.go
@@ -20,7 +21,7 @@
 ├─ handlerFuncs.go
 ├─ main.go
 └─ service.go
-
+```
 
 ## Resources
 
