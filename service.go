@@ -3,33 +3,42 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/exp/slices"
 )
 
-func AddChar(char Char, c *mongo.Collection, category string) error {
-	// findOne and findOneAndUpdate methods are not working as expected so fix them
-	filter := bson.D{{Key: "name", Value: category}}
+func AddWord(word Word, cc *mongo.Collection, category string) error {
+
 	var decodedCategory Category
-	err := c.FindOne(context.TODO(), filter).Decode(&decodedCategory)
+	filter := bson.D{{Key: "name", Value: category}}
+
+	err := cc.FindOne(context.TODO(), filter).Decode(&decodedCategory)
 
 	if err != nil && err == mongo.ErrNoDocuments {
 
-		var category Category = Category{Name: category, Chars: []Char{char}}
-		c.InsertOne(context.TODO(), category)
+		var category Category = Category{Name: category, Words: []Word{word}}
+		cc.InsertOne(context.TODO(), category)
+
 	} else if err == nil {
 
-		if slices.Contains(decodedCategory.Chars, char) {
+		var WordNames []string
 
-			return errors.New("char already exists")
+		for _, ch := range decodedCategory.Words {
+			WordNames = append(WordNames, ch.Value)
 		}
 
-		newChars := append(decodedCategory.Chars, char)
+		if slices.Contains(WordNames, word.Value) {
+			return errors.New("word already exists")
+		}
 
-		res := c.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "chars": newChars})
+		newWords := append(decodedCategory.Words, word)
+
+		res := cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": newWords})
 
 		if res.Err() != nil {
 			log.Fatal("unknown err occurred ", res.Err())
@@ -41,41 +50,102 @@ func AddChar(char Char, c *mongo.Collection, category string) error {
 	return nil
 }
 
-func AddCorrectorFalse(char Char, c *mongo.Collection, category string) error {
+func AddCorrectorFalse(word Word, cc *mongo.Collection, category string) error {
 
-	filter := bson.D{{Key: "name", Value: category}}
 	var decodedCategory Category
 
-	err := c.FindOne(context.TODO(), filter).Decode(&decodedCategory)
+	ctg := checkErr(cc, category)
+	fmt.Println(ctg)
+	typer := reflect.TypeOf(ctg).String()
 
-	if err != nil && err == mongo.ErrNoDocuments {
-
-		return errors.New("couldn't find the category")
-
-	} else if err == nil {
-		var foundedChar Char
-
-		for i, ch := range decodedCategory.Chars {
-			if ch.Value == char.Value {
-				foundedChar = ch
-				decodedCategory.Chars = append(decodedCategory.Chars[:i], decodedCategory.Chars[i+1:]...)
+	if typer == "main.Category" {
+		decodedCategory = ctg.(Category)
+		var foundedWord Word
+		fmt.Println(decodedCategory.Words)
+		for i, ch := range decodedCategory.Words {
+			if ch.Value == word.Value {
+				foundedWord = ch
+				decodedCategory.Words = append(decodedCategory.Words[:i], decodedCategory.Words[i+1:]...)
 			}
 		}
-		if (foundedChar == Char{}) {
-			return errors.New("couldn't find the char")
+
+		if (foundedWord == Word{}) {
+			return errors.New("couldn't find the word")
 		}
-		foundedChar.Trued += char.Trued
-		foundedChar.Falsed += char.Falsed
 
-		decodedCategory.Chars = append(decodedCategory.Chars, foundedChar)
+		foundedWord.Trued += word.Trued
+		foundedWord.Falsed += word.Falsed
 
-		c.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "chars": decodedCategory.Chars})
+		decodedCategory.Words = append(decodedCategory.Words, foundedWord)
 
+		cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
 	}
-
 	return nil
 }
 
-type TypedChar struct {
-	collection *mongo.Collection
+func Edit(word string, newWordValue string, cc *mongo.Collection, category string) error {
+
+	var decodedCategory Category
+
+	err := checkErr(cc, category)
+	if err == nil {
+		var foundedWord Word
+
+		for i, ch := range decodedCategory.Words {
+			if ch.Value == word {
+				foundedWord = ch
+				decodedCategory.Words = append(decodedCategory.Words[:i], decodedCategory.Words[i+1:]...)
+			}
+		}
+
+		if (foundedWord == Word{}) {
+			return errors.New("couldn't find the word")
+		}
+
+		foundedWord.Value = newWordValue
+
+		decodedCategory.Words = append(decodedCategory.Words, foundedWord)
+
+		cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
+	}
+	return nil
+}
+
+func Delete(word string, cc *mongo.Collection, category string) error {
+
+	var decodedCategory Category
+
+	err := checkErr(cc, category)
+
+	if err == nil {
+		var foundedWord Word
+
+		for i, ch := range decodedCategory.Words {
+			if ch.Value == word {
+				foundedWord = ch
+				decodedCategory.Words = append(decodedCategory.Words[:i], decodedCategory.Words[i+1:]...)
+			}
+		}
+
+		if (foundedWord == Word{}) {
+			return errors.New("couldn't find the word")
+		}
+
+		cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
+	}
+	return nil
+}
+
+func checkErr(cc *mongo.Collection, category string) any {
+	var decodedCategory Category
+
+	filter := bson.D{{Key: "name", Value: category}}
+
+	err := cc.FindOne(context.TODO(), filter).Decode(&decodedCategory)
+
+	if err != nil && err == mongo.ErrNoDocuments {
+		return errors.New("couldn't find the category")
+	}
+
+	return decodedCategory
 }
