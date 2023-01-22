@@ -8,7 +8,8 @@
 
 `/word/create`: 
 
-```
+```js
+
   method: "POST",
   headers: { category: "Category Name"},
   body: {  
