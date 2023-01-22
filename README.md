@@ -33,7 +33,7 @@
 
 [MongoDB](https://www.mongodb.com/)
 
-[MongoDB Compass** (for local usage)](https://www.mongodb.com/products/compass)
+[MongoDB Compass](https://www.mongodb.com/products/compass) (for local usage)
 
 ## Running the app
 
