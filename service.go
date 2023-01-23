@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"reflect"
 
@@ -15,15 +14,14 @@ import (
 func AddWord(word Word, cc *mongo.Collection, category string) error {
 
 	var decodedCategory Category
-	filter := bson.D{{Key: "name", Value: category}}
 
+	filter := bson.D{{Key: "name", Value: category}}
 	err := cc.FindOne(context.TODO(), filter).Decode(&decodedCategory)
 
 	if err != nil && err == mongo.ErrNoDocuments {
-
+		// create new category
 		var category Category = Category{Name: category, Words: []Word{word}}
 		cc.InsertOne(context.TODO(), category)
-
 	} else if err == nil {
 
 		var WordNames []string
@@ -44,7 +42,6 @@ func AddWord(word Word, cc *mongo.Collection, category string) error {
 			log.Fatal("unknown err occurred ", res.Err())
 			return res.Err()
 		}
-
 	}
 
 	return nil
@@ -55,13 +52,13 @@ func Corrector(word Word, cc *mongo.Collection, category string) error {
 	var decodedCategory Category
 
 	ctg := checkErr(cc, category)
-	fmt.Println(ctg)
 	typer := reflect.TypeOf(ctg).String()
 
 	if typer == "main.Category" {
+
 		decodedCategory = ctg.(Category)
 		var foundedWord Word
-		fmt.Println(decodedCategory.Words)
+
 		for i, ch := range decodedCategory.Words {
 			if ch.Value == word.Value {
 				foundedWord = ch
@@ -125,7 +122,9 @@ func Delete(word string, cc *mongo.Collection, category string) error {
 
 	ctg := checkErr(cc, category)
 	typer := reflect.TypeOf(ctg).String()
+
 	if typer == "main.Category" {
+
 		decodedCategory = ctg.(Category)
 		var foundedWord Word
 
@@ -139,11 +138,13 @@ func Delete(word string, cc *mongo.Collection, category string) error {
 		if (foundedWord == Word{}) {
 			return errors.New("couldn't find the word")
 		}
+
 		if len(decodedCategory.Words) == 0 {
 			cc.DeleteOne(context.TODO(), bson.M{"name": category})
 		} else {
 			cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
 		}
+
 	} else {
 		return errors.New("couldn't find the category")
 	}
@@ -153,9 +154,7 @@ func Delete(word string, cc *mongo.Collection, category string) error {
 func checkErr(cc *mongo.Collection, category string) any {
 	var decodedCategory Category
 
-	fmt.Println(category)
 	filter := bson.D{{Key: "name", Value: category}}
-
 	err := cc.FindOne(context.TODO(), filter).Decode(&decodedCategory)
 
 	if err != nil && err == mongo.ErrNoDocuments {

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
-	"net/http"
 )
 
 func CreateWord(cc *mongo.Collection) gin.HandlerFunc {
@@ -78,8 +78,6 @@ func EditWord(cc *mongo.Collection) gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println(body.New)
-
 		if body.Word == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"err message": "word is required"})
 			return
@@ -117,14 +115,17 @@ func DeleteWord(cc *mongo.Collection) gin.HandlerFunc {
 		var body RequestDTO
 
 		er := ctx.BindJSON(&body)
+
 		if er != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"err message": er.Error()})
 			return
 		}
+
 		if body.Word == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"err message": "word is required"})
 			return
 		}
+
 		if ctx.Request.Header["Category"] == nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"err message": "Category is required"})
 			return
@@ -144,6 +145,6 @@ func DeleteWord(cc *mongo.Collection) gin.HandlerFunc {
 }
 
 type RequestDTO struct {
-	Word string `json:"word"`
-	New  string `json:"new"`
+	Word 		string 		`json:"word"`
+	New  		string 		`json:"new"`
 }

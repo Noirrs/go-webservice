@@ -15,15 +15,16 @@ func main() {
 
 	fmt.Println("initializing...")
 
-	mongoConnURL, dbName, _ := LoadConfig()
+	mongoConnURL, dbName, port, _ := LoadConfig()
 	wordCollection := Connect(mongoConnURL, dbName)
 
-	Init(wordCollection)
+	Init(wordCollection, port)
 }
 
-func Init(cc *mongo.Collection) {
+func Init(cc *mongo.Collection, port string) {
 
 	gin.SetMode(gin.ReleaseMode)
+
 	ginn := gin.New()
 
 	ginn.Use(func(c *gin.Context) {
@@ -37,10 +38,11 @@ func Init(cc *mongo.Collection) {
 	group.POST("/correct", CorrectWord(cc))
 	group.POST("/edit", EditWord(cc))
 	group.POST("/delete", DeleteWord(cc))
-	log.Fatal(ginn.Run(":3000"))
+	
+	log.Fatal(ginn.Run(":"+port))
 }
 
-func LoadConfig() (string, string, string) {
+func LoadConfig() (string, string, string, string) {
 
 	fmt.Println("loading config...")
 
@@ -54,11 +56,12 @@ func LoadConfig() (string, string, string) {
 
 	json.Unmarshal(configFile, &config)
 
-	return config.MongoConnURL, config.DbName, config.Version
+	return config.MongoConnURL, config.DbName, config.Port, config.Version
 }
 
 type ConfigType struct {
 	Version      string `json:"version"`
 	MongoConnURL string `json:"mongoConnURL"`
 	DbName       string `json:"dbName"`
+	Port         string `json:"port"`
 }
