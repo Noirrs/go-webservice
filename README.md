@@ -51,6 +51,17 @@
   ```
   
   
+ `/word/delete`: 
+
+```js
+
+  method: "POST",
+  headers: { category: "Category Name"},
+  body: {  
+   "word": "Word's value field",
+  }
+  
+  ```
   
   
 # ✍️ Repository Structure 
