@@ -36,7 +36,7 @@ func Init(cc *mongo.Collection) {
 	group.POST("/create", CreateWord(cc))
 	group.POST("/correct", CorrectWord(cc))
 	group.POST("/edit", EditWord(cc))
-
+	group.POST("/delete", DeleteWord(cc))
 	log.Fatal(ginn.Run(":3000"))
 }
 

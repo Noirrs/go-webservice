@@ -50,7 +50,7 @@ func AddWord(word Word, cc *mongo.Collection, category string) error {
 	return nil
 }
 
-func AddCorrectorFalse(word Word, cc *mongo.Collection, category string) error {
+func Corrector(word Word, cc *mongo.Collection, category string) error {
 
 	var decodedCategory Category
 
@@ -79,6 +79,8 @@ func AddCorrectorFalse(word Word, cc *mongo.Collection, category string) error {
 		decodedCategory.Words = append(decodedCategory.Words, foundedWord)
 
 		cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
+	} else {
+		return errors.New("couldn't find the category")
 	}
 	return nil
 }
@@ -87,8 +89,12 @@ func Edit(word string, newWordValue string, cc *mongo.Collection, category strin
 
 	var decodedCategory Category
 
-	err := checkErr(cc, category)
-	if err == nil {
+	ctg := checkErr(cc, category)
+	typer := reflect.TypeOf(ctg).String()
+
+	if typer == "main.Category" {
+		decodedCategory = ctg.(Category)
+
 		var foundedWord Word
 
 		for i, ch := range decodedCategory.Words {
@@ -107,6 +113,8 @@ func Edit(word string, newWordValue string, cc *mongo.Collection, category strin
 		decodedCategory.Words = append(decodedCategory.Words, foundedWord)
 
 		cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
+	} else {
+		return errors.New("couldn't find the category")
 	}
 	return nil
 }
@@ -115,9 +123,10 @@ func Delete(word string, cc *mongo.Collection, category string) error {
 
 	var decodedCategory Category
 
-	err := checkErr(cc, category)
-
-	if err == nil {
+	ctg := checkErr(cc, category)
+	typer := reflect.TypeOf(ctg).String()
+	if typer == "main.Category" {
+		decodedCategory = ctg.(Category)
 		var foundedWord Word
 
 		for i, ch := range decodedCategory.Words {
@@ -130,8 +139,13 @@ func Delete(word string, cc *mongo.Collection, category string) error {
 		if (foundedWord == Word{}) {
 			return errors.New("couldn't find the word")
 		}
-
-		cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
+		if len(decodedCategory.Words) == 0 {
+			cc.DeleteOne(context.TODO(), bson.M{"name": category})
+		} else {
+			cc.FindOneAndReplace(context.TODO(), bson.M{"name": category}, bson.M{"name": category, "words": decodedCategory.Words})
+		}
+	} else {
+		return errors.New("couldn't find the category")
 	}
 	return nil
 }
@@ -139,6 +153,7 @@ func Delete(word string, cc *mongo.Collection, category string) error {
 func checkErr(cc *mongo.Collection, category string) any {
 	var decodedCategory Category
 
+	fmt.Println(category)
 	filter := bson.D{{Key: "name", Value: category}}
 
 	err := cc.FindOne(context.TODO(), filter).Decode(&decodedCategory)
