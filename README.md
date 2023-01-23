@@ -36,6 +36,21 @@
   
   ```
   
+    `/word/edit`: 
+
+```js
+
+  method: "POST",
+  headers: { category: "Category Name"},
+  body: {  
+   "word": "Word's value field",
+   "new": "Word's new value field"
+  }
+  
+  ```
+  
+  
+  
   
 # ✍️ Repository Structure 
 
